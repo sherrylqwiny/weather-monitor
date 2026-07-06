@@ -1,0 +1,9 @@
+<aside class="sidebar">
+  <div class="sidebar__title">Menu</div>
+  <nav class="sidebar__nav">
+    <a class="sidebar__link" href="#" *ngFor="let link of links">
+      <span class="sidebar__icon">{{ link.icon }}</span>
+      <span>{{ link.label }}</span>
+    </a>
+  </nav>
+</aside>

@@ -1,0 +1,30 @@
+.layout-shell {
+  display: flex;
+  min-height: 100vh;
+  background: var(--app-bg);
+}
+
+.layout-shell__sidebar {
+  flex-shrink: 0;
+}
+
+.layout-shell__main {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.layout-shell__content {
+  flex: 1;
+  padding: 1.25rem;
+}
+
+@media (max-width: 900px) {
+  .layout-shell {
+    flex-direction: column;
+  }
+
+  .layout-shell__content {
+    padding: 1rem;
+  }
+}

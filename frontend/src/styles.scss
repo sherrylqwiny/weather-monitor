@@ -1,0 +1,109 @@
+/* Global styles */
+:root {
+  color-scheme: light;
+  --app-bg: #f5f7fb;
+  --app-surface: #ffffff;
+  --app-surface-muted: #eef2f7;
+  --app-text: #14213d;
+  --app-text-muted: #5f6b7a;
+  --app-primary: #2563eb;
+  --app-accent: #0ea5e9;
+  --app-border: #dbe3ec;
+  --app-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+}
+
+body[data-theme='dark'] {
+  color-scheme: dark;
+  --app-bg: #07111f;
+  --app-surface: #0f172a;
+  --app-surface-muted: #172033;
+  --app-text: #f8fafc;
+  --app-text-muted: #94a3b8;
+  --app-primary: #60a5fa;
+  --app-accent: #38bdf8;
+  --app-border: #243244;
+  --app-shadow: 0 10px 30px rgba(2, 6, 23, 0.35);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+  background: var(--app-bg);
+  color: var(--app-text);
+  font-family: Inter, Roboto, 'Segoe UI', sans-serif;
+}
+
+body {
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+app-root {
+  display: block;
+  min-height: 100vh;
+}
+
+.container {
+  width: min(1120px, 100% - 2rem);
+  margin: 0 auto;
+}
+
+.card {
+  background: var(--app-surface);
+  border: 1px solid var(--app-border);
+  border-radius: 16px;
+  box-shadow: var(--app-shadow);
+}
+
+.text-muted {
+  color: var(--app-text-muted);
+}
+
+.flex {
+  display: flex;
+}
+
+.flex-column {
+  display: flex;
+  flex-direction: column;
+}
+
+.align-center {
+  align-items: center;
+}
+
+.justify-between {
+  justify-content: space-between;
+}
+
+.gap-1 { gap: 0.25rem; }
+.gap-2 { gap: 0.5rem; }
+.gap-3 { gap: 0.75rem; }
+.gap-4 { gap: 1rem; }
+.gap-5 { gap: 1.25rem; }
+
+.p-1 { padding: 0.25rem; }
+.p-2 { padding: 0.5rem; }
+.p-3 { padding: 0.75rem; }
+.p-4 { padding: 1rem; }
+.p-5 { padding: 1.25rem; }
+
+.m-1 { margin: 0.25rem; }
+.m-2 { margin: 0.5rem; }
+.m-3 { margin: 0.75rem; }
+.m-4 { margin: 1rem; }
+.m-5 { margin: 1.25rem; }
+
+.btn-primary {
+  background: var(--app-primary);
+  color: white;
+  border: 0;
+  border-radius: 999px;
+  padding: 0.7rem 1rem;
+  cursor: pointer;
+}

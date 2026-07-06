@@ -1,0 +1,31 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.sqlite3
+*.db
+.env
+.venv/
+venv/
+backend/.env
+
+# Django
+*.log
+media/
+staticfiles/
+
+# Node / Angular
+node_modules/
+dist/
+out-tsc/
+.angular/
+coverage/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
