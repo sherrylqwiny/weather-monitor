@@ -380,3 +380,124 @@ The application should be suitable as a university final-year project, emphasizi
 ## Repository Status
 
 This repository currently serves as the foundation for the proposed system. The README documents the project scope, requirements, architecture direction, and planned features for implementation.
+
+---
+
+## Frontend — Setup & Run (Development)
+
+Follow these steps to get the Angular frontend running locally. This guide assumes you only want to run the frontend for now (the backend can be set up later).
+
+Prerequisites
+- Git (to clone the repository)
+- Node.js (LTS recommended, e.g. 18.x or newer) and npm (bundled with Node)
+- Optional: Angular CLI installed globally (recommended for convenience)
+
+Check your environment (PowerShell / CMD):
+
+```powershell
+node -v
+npm -v
+ng version  # optional, fails if CLI not installed globally
+```
+
+If Node.js is missing, download and install it from https://nodejs.org/ (select LTS). If you do not want to install the Angular CLI globally, you can use the local CLI via `npx`.
+
+Clone the repository
+
+```powershell
+git clone https://github.com/sherrylqwiny/weather-monitor online-weather-monitoring-system
+cd online-weather-monitoring-system
+```
+
+Front-end workspace
+
+The frontend application lives in the `frontend` folder. Change into that directory and install dependencies:
+
+```powershell
+cd frontend
+npm install
+# If you get peer dependency errors or conflicts, try:
+# npm install --legacy-peer-deps
+```
+
+If you don't have the Angular CLI globally and prefer to install it:
+
+```powershell
+npm install -g @angular/cli
+```
+
+Install UI and chart dependencies (if missing)
+
+The project already contains the required packages in `package.json`, but if you need to add them manually use the following (matched to the generated Angular version):
+
+```powershell
+# Compatible with Angular 21 scaffold used in this repository
+npm install @angular/material@21 @angular/cdk@21 @angular/animations@21
+npm install chart.js ng2-charts@8
+npm install @angular/service-worker
+```
+
+Environment configuration
+
+Frontend environment files are in `src/environments`. Edit `src/environments/environment.ts` for development values (API base URL, feature toggles):
+
+- [frontend/src/environments/environment.ts](frontend/src/environments/environment.ts)
+- [frontend/src/environments/environment.prod.ts](frontend/src/environments/environment.prod.ts)
+
+Running the development server
+
+Start the dev server (default port 4200):
+
+```powershell
+ng serve
+# or if Angular CLI is not global
+npx ng serve
+```
+
+Open your browser to:
+
+```
+http://localhost:4200
+```
+
+Custom host / port (network access):
+
+```powershell
+ng serve --host 0.0.0.0 --port 4200
+```
+
+Building for production and testing the PWA service worker
+
+To build a production bundle and enable the service worker (PWA):
+
+```powershell
+ng build --configuration production
+```
+
+To test the production build (service worker) locally, serve the contents of `dist/frontend` with a static server (this requires the production service worker files to be present):
+
+```powershell
+npm install -g http-server
+http-server ./dist/frontend -p 8080
+# then open http://localhost:8080
+```
+
+Troubleshooting
+
+- If `npm install` fails with peer dependency errors, try `npm install --legacy-peer-deps`.
+- If `ng` is not found, either install Angular CLI globally (`npm install -g @angular/cli`) or use `npx ng`.
+- If ports are in use, change `--port` in `ng serve`.
+- If you see style or build errors after edits, run a clean install:
+
+```powershell
+rm -r node_modules package-lock.json
+npm install
+```
+
+Next steps (recommended)
+
+- Verify the app loads at `http://localhost:4200` and the layout (sidebar/topbar/footer) renders.
+- Wire the frontend to a running backend API by updating `environment.apiBaseUrl`.
+- Create a local `.env` or CI secrets for any API keys (do not commit secrets).
+
+If you want, I can add a single-command PowerShell script to automate the frontend setup (install + serve) or create a small CONTRIBUTING section describing how to run both backend and frontend together.
