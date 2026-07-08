@@ -501,3 +501,31 @@ Next steps (recommended)
 - Create a local `.env` or CI secrets for any API keys (do not commit secrets).
 
 If you want, I can add a single-command PowerShell script to automate the frontend setup (install + serve) or create a small CONTRIBUTING section describing how to run both backend and frontend together.
+
+---
+
+## Phase 2 — UI/UX Design (Frontend Only)
+
+This phase focuses on designing and implementing reusable UI components for the Angular frontend. The following shared components will be created under `src/app/shared/components` and used across the dashboard, forecast, alerts, and favorites pages.
+
+Shared Components
+
+- **Weather Card**: compact current-weather summary with temperature, location, and quick actions.
+- **Forecast Card**: daily/hourly forecast tile used in lists and detail views.
+- **Alert Card**: displays active alerts with severity and dismiss/action controls.
+- **Statistics Card**: small card for KPI values (humidity, wind, UV index, precipitation chance).
+- **Search Bar**: autocomplete search input for cities and locations.
+- **Weather Icon Component**: renders SVG/weather icons consistently across cards.
+- **Loading Spinner**: reusable loading indicator for network requests.
+- **Empty State Component**: friendly UI shown when lists are empty.
+- **Error Component**: shows error messages and retry actions.
+- **Confirm Dialog**: generic confirmation modal for destructive actions.
+- **Reusable Buttons**: standardized button variants (primary, secondary, icon-only).
+
+Implementation notes
+
+- Place component stubs in `frontend/src/app/shared/components/<component-name>/`.
+- Each component should have its own `.ts`, `.html`, and `.scss` files and be exported by `SharedModule`.
+- Start by creating minimal presentation-only components, then add inputs/outputs and services as needed.
+
+If you'd like, I can wire these components into `SharedModule` and generate Angular CLI component declarations next. Tell me whether you prefer I create only stubs (presentation files) or full Angular CLI components (declared in module and ready to use).

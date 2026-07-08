@@ -1,41 +1,35 @@
 import { Component } from '@angular/core';
 import { ThemeService } from './core/services/theme.service';
+import { Router, NavigationEnd } from '@angular/router';
 
 @Component({
   selector: 'app-root',
   template: `
-    <app-dashboard-layout>
-      <section class="card" style="padding: 2rem;">
-        <div class="flex justify-between align-center gap-4">
-          <div>
-            <h1>{{ title }}</h1>
-            <p class="text-muted">A modern Progressive Web App for weather monitoring and forecasting.</p>
-          </div>
-          <button class="btn-primary" type="button" (click)="toggleTheme()">
-            Toggle theme
-          </button>
-        </div>
+    <ng-container *ngIf="isAuthRoute; else dashboardLayout">
+      <router-outlet></router-outlet>
+    </ng-container>
 
-        <div class="flex-column gap-3" style="margin-top: 1.5rem;">
-          <div class="card p-4">
-            <h2>Weather dashboard</h2>
-            <p class="text-muted">Search cities, view current conditions, and track forecasts.</p>
-          </div>
-          <div class="card p-4">
-            <h2>Features</h2>
-            <p class="text-muted">Favorites, alerts, historical records, and admin analytics.</p>
-          </div>
-        </div>
-      </section>
-    </app-dashboard-layout>
+    <ng-template #dashboardLayout>
+      <app-dashboard-layout>
+        <router-outlet></router-outlet>
+      </app-dashboard-layout>
+    </ng-template>
   `,
   standalone: false,
   styleUrl: './app.scss',
 })
 export class App {
   title = 'Online Weather Monitoring System';
+  isAuthRoute = false;
 
-  constructor(private themeService: ThemeService) {}
+  constructor(private themeService: ThemeService, private router: Router) {
+    this.router.events.subscribe((event) => {
+      if (event instanceof NavigationEnd) {
+        const currentUrl = event.urlAfterRedirects;
+        this.isAuthRoute = currentUrl === '/login' || currentUrl === '/register' || currentUrl === '/forgot-password' || currentUrl === '/reset-password' || currentUrl === '/profile';
+      }
+    });
+  }
 
   toggleTheme(): void {
     this.themeService.toggleTheme();

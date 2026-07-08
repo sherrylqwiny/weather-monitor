@@ -8,11 +8,11 @@ import { Component } from '@angular/core';
 })
 export class SidebarComponent {
   links = [
-    { label: 'Dashboard', icon: '◉' },
-    { label: 'Weather', icon: '☁' },
-    { label: 'Forecast', icon: '📅' },
-    { label: 'Favorites', icon: '★' },
-    { label: 'Alerts', icon: '⚠' },
-    { label: 'Admin', icon: '⚙' },
+    { label: 'Dashboard', icon: '◉', route: '/dashboard' },
+    { label: 'Weather', icon: '☁', route: '/weather/search' },
+    { label: 'Forecast', icon: '📅', route: '/weather/weekly' },
+    { label: 'Favorites', icon: '★', route: '/favorites' },
+    { label: 'Alerts', icon: '⚠', route: '/alerts' },
+    { label: 'Admin', icon: '⚙', route: '/admin' },
   ];
 }
