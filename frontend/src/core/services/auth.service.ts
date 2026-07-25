@@ -29,7 +29,7 @@ export interface User {
   providedIn: 'root'
 })
 export class AuthService {
-  private apiUrl = `${environment.apiBaseUrl}/accounts`;
+  private apiUrl = `${environment.apiBaseUrl}`;
   private userSubject = new BehaviorSubject<User | null>(this.getUserFromLocalStorage());
   public user$ = this.userSubject.asObservable();
 
@@ -56,7 +56,7 @@ export class AuthService {
    * Register a new user
    */
   register(email: string, username: string, password: string, firstName?: string, lastName?: string): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.apiUrl}/register/register/`, {
+    return this.http.post<AuthResponse>(`${this.apiUrl}/auth/register/`, {
       email,
       username,
       password,
@@ -73,7 +73,7 @@ export class AuthService {
    * Login user
    */
   login(email: string, password: string): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.apiUrl}/login/login/`, {
+    return this.http.post<AuthResponse>(`${this.apiUrl}/auth/login/`, {
       email,
       password
     }).pipe(
@@ -88,7 +88,7 @@ export class AuthService {
   logout(): void {
     const refreshToken = this.getRefreshToken();
     if (refreshToken) {
-      this.http.post(`${this.apiUrl}/logout/logout/`, {
+      this.http.post(`${this.apiUrl}/auth/logout/`, {
         refresh: refreshToken
       }).subscribe({
         complete: () => this.clearTokens()
@@ -102,7 +102,7 @@ export class AuthService {
    * Get current user profile
    */
   getProfile(): Observable<User> {
-    return this.http.get<User>(`${this.apiUrl}/profile/me/`).pipe(
+    return this.http.get<User>(`${this.apiUrl}/accounts/profile/me/`).pipe(
       tap(user => this.userSubject.next(user)),
       catchError(this.handleError)
     );
@@ -112,7 +112,7 @@ export class AuthService {
    * Update user profile
    */
   updateProfile(updates: Partial<User>): Observable<User> {
-    return this.http.patch<User>(`${this.apiUrl}/profile/update_profile/`, updates).pipe(
+    return this.http.patch<User>(`${this.apiUrl}/accounts/profile/update_profile/`, updates).pipe(
       tap(user => this.userSubject.next(user)),
       catchError(this.handleError)
     );
@@ -122,7 +122,7 @@ export class AuthService {
    * Change password
    */
   changePassword(oldPassword: string, newPassword: string): Observable<any> {
-    return this.http.post(`${this.apiUrl}/password-change/change_password/`, {
+    return this.http.post(`${this.apiUrl}/accounts/password-change/change_password/`, {
       old_password: oldPassword,
       new_password: newPassword,
       new_password_confirm: newPassword
@@ -135,7 +135,7 @@ export class AuthService {
    * Request password reset
    */
   requestPasswordReset(email: string): Observable<any> {
-    return this.http.post(`${this.apiUrl}/password-reset/request_reset/`, {
+    return this.http.post(`${this.apiUrl}/accounts/password-reset/request_reset/`, {
       email
     }).pipe(
       catchError(this.handleError)
@@ -146,7 +146,7 @@ export class AuthService {
    * Confirm password reset
    */
   confirmPasswordReset(token: string, newPassword: string): Observable<any> {
-    return this.http.post(`${this.apiUrl}/password-reset/confirm_reset/`, {
+    return this.http.post(`${this.apiUrl}/accounts/password-reset/confirm_reset/`, {
       token,
       new_password: newPassword,
       new_password_confirm: newPassword

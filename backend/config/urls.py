@@ -3,8 +3,12 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
 
+from apps.accounts.views import LoginView, RegisterView
+
 urlpatterns = [
     path("admin/", admin.site.urls),
+    path("api/auth/login/", LoginView.as_view({"post": "login"}), name="auth-login"),
+    path("api/auth/register/", RegisterView.as_view({"post": "register"}), name="auth-register"),
     path("api/accounts/", include("apps.accounts.urls")),
     path("api/weather/", include("apps.weather.urls")),
     path("api/forecasts/", include("apps.forecasts.urls")),
