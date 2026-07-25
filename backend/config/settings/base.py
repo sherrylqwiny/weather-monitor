@@ -1,6 +1,7 @@
 import os
 from datetime import timedelta
 from pathlib import Path
+from urllib.parse import urlsplit
 
 import dj_database_url
 from dotenv import load_dotenv
@@ -27,6 +28,29 @@ def get_env_list(name, default=""):
             values.append(cleaned)
 
     return values
+
+
+def normalize_origin(value):
+    origin = value.strip()
+    if not origin:
+        return ""
+
+    if origin.startswith(("http://", "https://")):
+        parsed = urlsplit(origin)
+        if parsed.scheme and parsed.netloc:
+            return f"{parsed.scheme}://{parsed.netloc}"
+
+    return origin.rstrip("/")
+
+
+def get_origin_list(name, default=""):
+    return list(
+        dict.fromkeys(
+            normalize_origin(origin)
+            for origin in get_env_list(name, default)
+            if normalize_origin(origin)
+        )
+    )
 
 
 def get_default_settings_module():
@@ -228,7 +252,7 @@ AUTH_USER_MODEL = "accounts.User"
 # ------------------------------------------------------------------------------
 # CORS
 # ------------------------------------------------------------------------------
-CORS_ALLOWED_ORIGINS = get_env_list(
+CORS_ALLOWED_ORIGINS = get_origin_list(
     "CORS_ALLOWED_ORIGINS",
     "http://localhost:4200,http://127.0.0.1:4200",
 )
@@ -238,7 +262,7 @@ CORS_ALLOW_CREDENTIALS = True
 # ------------------------------------------------------------------------------
 # CSRF
 # ------------------------------------------------------------------------------
-CSRF_TRUSTED_ORIGINS = get_env_list(
+CSRF_TRUSTED_ORIGINS = get_origin_list(
     "CSRF_TRUSTED_ORIGINS",
     "http://localhost:4200,http://127.0.0.1:4200",
 )

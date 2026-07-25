@@ -29,7 +29,7 @@ ALLOWED_HOSTS = allowed_hosts
 
 CORS_ALLOW_ALL_ORIGINS = False
 
-cros_origins = get_env_list("CORS_ALLOWED_ORIGINS", "")
+cros_origins = get_origin_list("CORS_ALLOWED_ORIGINS", "")
 if railway_domain:
     cros_origins.append(f"https://{railway_domain}")
 
@@ -41,7 +41,7 @@ CORS_ALLOW_CREDENTIALS = True
 # CSRF
 # ------------------------------------------------------------------------------
 
-csrf_origins = get_env_list("CSRF_TRUSTED_ORIGINS", "")
+csrf_origins = get_origin_list("CSRF_TRUSTED_ORIGINS", "")
 if railway_domain:
     csrf_origins.append(f"https://{railway_domain}")
 
