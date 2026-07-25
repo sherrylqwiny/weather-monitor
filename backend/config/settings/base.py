@@ -1,15 +1,33 @@
 import os
 from pathlib import Path
+from datetime import timedelta
 
+import dj_database_url
 from dotenv import load_dotenv
 
+# ------------------------------------------------------------------------------
+# Base Directory
+# ------------------------------------------------------------------------------
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
+
+# Load environment variables
 load_dotenv(BASE_DIR / ".env")
 
+# ------------------------------------------------------------------------------
+# Security
+# ------------------------------------------------------------------------------
 SECRET_KEY = os.getenv("SECRET_KEY", "dev-secret-key")
-DEBUG = os.getenv("DEBUG", "True").lower() == "true"
-ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
 
+DEBUG = os.getenv("DEBUG", "True").lower() == "true"
+
+ALLOWED_HOSTS = os.getenv(
+    "ALLOWED_HOSTS",
+    "localhost,127.0.0.1"
+).split(",")
+
+# ------------------------------------------------------------------------------
+# Applications
+# ------------------------------------------------------------------------------
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -17,9 +35,13 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+
+    # Third-party
     "corsheaders",
     "rest_framework",
     "rest_framework_simplejwt",
+
+    # Local apps
     "apps.accounts",
     "apps.weather",
     "apps.forecasts",
@@ -30,6 +52,9 @@ INSTALLED_APPS = [
     "apps.common",
 ]
 
+# ------------------------------------------------------------------------------
+# Middleware
+# ------------------------------------------------------------------------------
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
@@ -42,7 +67,14 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
+# ------------------------------------------------------------------------------
+# URL Configuration
+# ------------------------------------------------------------------------------
 ROOT_URLCONF = "config.urls"
+
+# ------------------------------------------------------------------------------
+# Templates
+# ------------------------------------------------------------------------------
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
@@ -56,31 +88,62 @@ TEMPLATES = [
                 "django.contrib.messages.context_processors.messages",
             ],
         },
-    }
+    },
 ]
 
+# ------------------------------------------------------------------------------
+# WSGI / ASGI
+# ------------------------------------------------------------------------------
 WSGI_APPLICATION = "config.wsgi.application"
 ASGI_APPLICATION = "config.asgi.application"
 
+# ------------------------------------------------------------------------------
+# Database
+# Local -> SQLite
+# Railway -> PostgreSQL via DATABASE_URL
+# ------------------------------------------------------------------------------
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
-    }
+    "default": dj_database_url.config(
+        default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
+        conn_max_age=600,
+        ssl_require=False,
+    )
 }
 
+# ------------------------------------------------------------------------------
+# Internationalization
+# ------------------------------------------------------------------------------
 LANGUAGE_CODE = "en-us"
+
 TIME_ZONE = "Africa/Nairobi"
+
 USE_I18N = True
 USE_TZ = True
 
+# ------------------------------------------------------------------------------
+# Static & Media Files
+# ------------------------------------------------------------------------------
 STATIC_URL = "/static/"
-STATIC_ROOT = BASE_DIR / "static"
+STATIC_ROOT = BASE_DIR / "staticfiles"
+
+STATICFILES_DIRS = [
+    BASE_DIR / "static",
+]
+
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
+STORAGES = {
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    }
+}
+
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+# ------------------------------------------------------------------------------
+# Django REST Framework
+# ------------------------------------------------------------------------------
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework_simplejwt.authentication.JWTAuthentication",
@@ -91,9 +154,9 @@ REST_FRAMEWORK = {
     ],
 }
 
-# JWT Configuration
-from datetime import timedelta
-
+# ------------------------------------------------------------------------------
+# JWT
+# ------------------------------------------------------------------------------
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=15),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
@@ -104,22 +167,46 @@ SIMPLE_JWT = {
     "SIGNING_KEY": SECRET_KEY,
 }
 
+# ------------------------------------------------------------------------------
 # Custom User Model
+# ------------------------------------------------------------------------------
 AUTH_USER_MODEL = "accounts.User"
 
-# CORS (development convenience)
-CORS_ALLOW_ALL_ORIGINS = True
+# ------------------------------------------------------------------------------
+# CORS
+# ------------------------------------------------------------------------------
+CORS_ALLOWED_ORIGINS = os.getenv(
+    "CORS_ALLOWED_ORIGINS",
+    "http://localhost:4200,http://127.0.0.1:4200"
+).split(",")
+
 CORS_ALLOW_CREDENTIALS = True
 
-# OpenWeather integration
+# ------------------------------------------------------------------------------
+# CSRF
+# ------------------------------------------------------------------------------
+CSRF_TRUSTED_ORIGINS = os.getenv(
+    "CSRF_TRUSTED_ORIGINS",
+    "http://localhost:4200,http://127.0.0.1:4200"
+).split(",")
+
+# ------------------------------------------------------------------------------
+# OpenWeather API
+# ------------------------------------------------------------------------------
 OPENWEATHER_API_KEY = os.getenv("OPENWEATHER_API_KEY", "")
+
 OPENWEATHER_BASE_URL = os.getenv(
     "OPENWEATHER_BASE_URL",
     "https://api.openweathermap.org/data/2.5",
 )
-OPENWEATHER_CACHE_TTL = int(os.getenv("OPENWEATHER_CACHE_TTL", "600"))
 
-# Local-memory caching is appropriate for development. Configure Redis in production.
+OPENWEATHER_CACHE_TTL = int(
+    os.getenv("OPENWEATHER_CACHE_TTL", "600")
+)
+
+# ------------------------------------------------------------------------------
+# Cache
+# ------------------------------------------------------------------------------
 CACHES = {
     "default": {
         "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
@@ -127,5 +214,15 @@ CACHES = {
     }
 }
 
-# Whitenoise: serve static files in production when configured
-STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+# ------------------------------------------------------------------------------
+# Railway / Production Security
+# ------------------------------------------------------------------------------
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+
+USE_X_FORWARDED_HOST = True
+
+SECURE_SSL_REDIRECT = not DEBUG
+
+SESSION_COOKIE_SECURE = not DEBUG
+
+CSRF_COOKIE_SECURE = not DEBUG
