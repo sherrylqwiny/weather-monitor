@@ -13,3 +13,4 @@ pillow
 python-dotenv
 django-cors-headers
 reportlab
+dj-database-url
