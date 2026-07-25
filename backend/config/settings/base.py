@@ -1,33 +1,84 @@
 import os
-from pathlib import Path
 from datetime import timedelta
+from pathlib import Path
 
 import dj_database_url
 from dotenv import load_dotenv
+from django.core.exceptions import ImproperlyConfigured
 
 # ------------------------------------------------------------------------------
 # Base Directory
 # ------------------------------------------------------------------------------
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
+PROJECT_DIR = BASE_DIR.parent
 
-# Load environment variables
+# Load environment variables from both the backend and project root
+load_dotenv(PROJECT_DIR / ".env")
 load_dotenv(BASE_DIR / ".env")
+
+
+def get_env_list(name, default=""):
+    values = []
+    raw_value = os.getenv(name, default)
+
+    for value in raw_value.split(","):
+        cleaned = value.strip()
+        if cleaned:
+            values.append(cleaned)
+
+    return values
+
+
+def get_default_settings_module():
+    if os.getenv("DJANGO_SETTINGS_MODULE"):
+        return os.getenv("DJANGO_SETTINGS_MODULE")
+
+    environment = os.getenv("RAILWAY_ENVIRONMENT") or os.getenv("ENVIRONMENT", "").strip().lower()
+    if environment in {"production", "prod", "staging"}:
+        return "config.settings.production"
+
+    return "config.settings.development"
+
+
+def get_database_config():
+    database_url = os.getenv("DATABASE_URL", "").strip()
+
+    if not database_url:
+        return {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
+        }
+
+    try:
+        parsed_config = dj_database_url.parse(
+            database_url,
+            conn_max_age=600,
+            ssl_require=False,
+        )
+    except Exception as exc:  # pragma: no cover - defensive path for invalid env values
+        raise ImproperlyConfigured(
+            "DATABASE_URL is invalid. Use a standard PostgreSQL or SQLite URL."
+        ) from exc
+
+    return parsed_config
+
 
 # ------------------------------------------------------------------------------
 # Security
 # ------------------------------------------------------------------------------
-SECRET_KEY = os.getenv("SECRET_KEY", "dev-secret-key")
-
 DEBUG = os.getenv("DEBUG", "True").lower() == "true"
 
-ALLOWED_HOSTS = [
-    host.strip()
-    for host in os.getenv(
-        "ALLOWED_HOSTS",
-        "localhost,127.0.0.1"
-    ).split(",")
-    if host.strip()
-]
+SECRET_KEY = os.getenv("SECRET_KEY")
+if not SECRET_KEY:
+    if DEBUG:
+        SECRET_KEY = "django-insecure-development-secret"
+    else:
+        raise ImproperlyConfigured("SECRET_KEY must be set in production environments")
+
+ALLOWED_HOSTS = get_env_list(
+    "ALLOWED_HOSTS",
+    "localhost,127.0.0.1",
+)
 
 # ------------------------------------------------------------------------------
 # Applications
@@ -106,23 +157,8 @@ ASGI_APPLICATION = "config.asgi.application"
 # Local -> SQLite
 # Railway -> PostgreSQL via DATABASE_URL
 # ------------------------------------------------------------------------------
-DATABASE_URL = os.getenv("DATABASE_URL")
+DATABASES = {"default": get_database_config()}
 
-if DATABASE_URL:
-    DATABASES = {
-        "default": dj_database_url.parse(
-            DATABASE_URL,
-            conn_max_age=600,
-            ssl_require=False,
-        )
-    }
-else:
-    DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.sqlite3",
-            "NAME": BASE_DIR / "db.sqlite3",
-        }
-    }
 # ------------------------------------------------------------------------------
 # Internationalization
 # ------------------------------------------------------------------------------
@@ -192,28 +228,20 @@ AUTH_USER_MODEL = "accounts.User"
 # ------------------------------------------------------------------------------
 # CORS
 # ------------------------------------------------------------------------------
-CORS_ALLOWED_ORIGINS = [
-    origin.strip()
-    for origin in os.getenv(
-        "CORS_ALLOWED_ORIGINS",
-        "http://localhost:4200,http://127.0.0.1:4200"
-    ).split(",")
-    if origin.strip()
-]
+CORS_ALLOWED_ORIGINS = get_env_list(
+    "CORS_ALLOWED_ORIGINS",
+    "http://localhost:4200,http://127.0.0.1:4200",
+)
 
 CORS_ALLOW_CREDENTIALS = True
 
 # ------------------------------------------------------------------------------
 # CSRF
 # ------------------------------------------------------------------------------
-CSRF_TRUSTED_ORIGINS = [
-    origin.strip()
-    for origin in os.getenv(
-        "CSRF_TRUSTED_ORIGINS",
-        "http://localhost:4200,http://127.0.0.1:4200"
-    ).split(",")
-    if origin.strip()
-]
+CSRF_TRUSTED_ORIGINS = get_env_list(
+    "CSRF_TRUSTED_ORIGINS",
+    "http://localhost:4200,http://127.0.0.1:4200",
+)
 
 # ------------------------------------------------------------------------------
 # OpenWeather API

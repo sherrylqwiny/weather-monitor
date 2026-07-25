@@ -6,14 +6,16 @@ from .base import *
 
 DEBUG = False
 
-ALLOWED_HOSTS = [
-    host.strip()
-    for host in os.getenv(
-        "ALLOWED_HOSTS",
-        ".up.railway.app"
-    ).split(",")
-    if host.strip()
-]
+railway_domain = os.getenv("RAILWAY_PUBLIC_DOMAIN", "").strip()
+allowed_hosts = get_env_list(
+    "ALLOWED_HOSTS",
+    ".up.railway.app",
+)
+
+if railway_domain:
+    allowed_hosts.append(railway_domain)
+
+ALLOWED_HOSTS = allowed_hosts
 
 # ------------------------------------------------------------------------------
 # Database
@@ -27,11 +29,11 @@ ALLOWED_HOSTS = [
 
 CORS_ALLOW_ALL_ORIGINS = False
 
-CORS_ALLOWED_ORIGINS = [
-    origin.strip()
-    for origin in os.getenv("CORS_ALLOWED_ORIGINS", "").split(",")
-    if origin.strip()
-]
+cros_origins = get_env_list("CORS_ALLOWED_ORIGINS", "")
+if railway_domain:
+    cros_origins.append(f"https://{railway_domain}")
+
+CORS_ALLOWED_ORIGINS = list(dict.fromkeys(cros_origins))
 
 CORS_ALLOW_CREDENTIALS = True
 
@@ -39,11 +41,11 @@ CORS_ALLOW_CREDENTIALS = True
 # CSRF
 # ------------------------------------------------------------------------------
 
-CSRF_TRUSTED_ORIGINS = [
-    origin.strip()
-    for origin in os.getenv("CSRF_TRUSTED_ORIGINS", "").split(",")
-    if origin.strip()
-]
+csrf_origins = get_env_list("CSRF_TRUSTED_ORIGINS", "")
+if railway_domain:
+    csrf_origins.append(f"https://{railway_domain}")
+
+CSRF_TRUSTED_ORIGINS = list(dict.fromkeys(csrf_origins))
 
 # ------------------------------------------------------------------------------
 # Security
@@ -71,7 +73,27 @@ SECURE_REFERRER_POLICY = "strict-origin-when-cross-origin"
 # Static Files
 # ------------------------------------------------------------------------------
 
-STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
+
+# ------------------------------------------------------------------------------
+# Celery
+# ------------------------------------------------------------------------------
+
+CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL") or os.getenv("REDIS_URL") or "memory://"
+CELERY_RESULT_BACKEND = os.getenv("CELERY_RESULT_BACKEND") or os.getenv("REDIS_URL") or "memory://"
+CELERY_ACCEPT_CONTENT = ["json"]
+CELERY_TASK_SERIALIZER = "json"
+CELERY_RESULT_SERIALIZER = "json"
+CELERY_TIMEZONE = TIME_ZONE
+CELERY_TASK_TRACK_STARTED = True
+CELERY_TASK_TIME_LIMIT = 30 * 60
 
 # ------------------------------------------------------------------------------
 # Logging

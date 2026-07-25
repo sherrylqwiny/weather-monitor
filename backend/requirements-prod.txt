@@ -1,0 +1,16 @@
+Django
+gunicorn
+djangorestframework
+django-environ
+djangorestframework-simplejwt
+PyJWT
+psycopg2-binary
+celery
+redis
+requests
+whitenoise
+pillow
+python-dotenv
+django-cors-headers
+reportlab
+dj-database-url

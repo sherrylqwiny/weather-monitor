@@ -3,9 +3,11 @@ import os
 import sys
 
 if __name__ == "__main__":
+    from config.settings.base import get_default_settings_module
+
     os.environ.setdefault(
         "DJANGO_SETTINGS_MODULE",
-        "config.settings.production"
+        get_default_settings_module(),
     )
 
     try:
