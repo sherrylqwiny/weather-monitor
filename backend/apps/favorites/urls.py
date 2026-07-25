@@ -4,7 +4,7 @@ from rest_framework.routers import DefaultRouter
 from .views import FavoriteCityViewSet
 
 router = DefaultRouter()
-router.register(r"favorites", FavoriteCityViewSet)
+router.register(r"favorites", FavoriteCityViewSet, basename="favorite")
 
 urlpatterns = [
     path("", include(router.urls)),

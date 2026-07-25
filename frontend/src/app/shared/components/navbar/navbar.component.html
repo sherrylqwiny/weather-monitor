@@ -4,6 +4,14 @@
     <button class="icon-btn" type="button" aria-label="Notifications">
       🔔 <span class="badge">{{ notifications }}</span>
     </button>
-    <button class="icon-btn" type="button" aria-label="Profile">👤</button>
+    <div class="user-menu" *ngIf="currentUser">
+      <button class="icon-btn user-btn" type="button" (click)="toggleUserMenu()" aria-label="Profile">
+        👤 {{ currentUser.first_name || currentUser.username }}
+      </button>
+      <div *ngIf="showUserMenu" class="dropdown-menu">
+        <button (click)="goToProfile()">Profile</button>
+        <button (click)="logout()">Logout</button>
+      </div>
+    </div>
   </div>
 </header>

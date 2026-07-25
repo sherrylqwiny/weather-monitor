@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { WeatherCardComponent } from '../../../app/shared/components/weather-card/weather-card.component';
+import { FavoriteCityWeather } from '../../../core/services/dashboard.service';
 
 @Component({
   selector: 'app-favorite-cities',
@@ -9,9 +10,11 @@ import { WeatherCardComponent } from '../../../app/shared/components/weather-car
   template: `
     <div class="favorite-cities">
       <h4>Favorite Cities</h4>
-      <app-weather-card *ngFor="let c of [1,2,3]"></app-weather-card>
+      <app-weather-card *ngFor="let city of cities" [weather]="city.weather" [fallbackCity]="city.city"></app-weather-card>
     </div>
   `,
   styles: [`.favorite-cities { margin-bottom: 1rem; }`]
 })
-export class FavoriteCitiesComponent {}
+export class FavoriteCitiesComponent {
+  @Input() cities: FavoriteCityWeather[] = [];
+}

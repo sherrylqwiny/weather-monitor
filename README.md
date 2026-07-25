@@ -498,6 +498,215 @@ Next steps (recommended)
 
 - Verify the app loads at `http://localhost:4200` and the layout (sidebar/topbar/footer) renders.
 - Wire the frontend to a running backend API by updating `environment.apiBaseUrl`.
+
+---
+
+## Backend — Setup & Run (Development)
+
+Follow these steps to get the Django REST API running locally.
+
+### Prerequisites
+
+- Python 3.9 or higher
+- pip (Python package manager)
+- Git (to clone the repository, if not done already)
+
+Check your environment:
+
+```powershell
+python --version
+pip --version
+```
+
+If Python is missing, download and install it from https://www.python.org/ (select the latest 3.x version and **check "Add Python to PATH"** during installation).
+
+### Backend workspace
+
+Change into the backend directory:
+
+```powershell
+cd backend
+```
+
+### Create virtual environment
+
+A virtual environment isolates project dependencies from your system Python:
+
+```powershell
+python -m venv venv
+```
+
+### Activate virtual environment
+
+**Windows (PowerShell):**
+```powershell
+.\venv\Scripts\Activate.ps1
+```
+
+**Windows (Command Prompt):**
+```cmd
+venv\Scripts\activate.bat
+```
+
+**macOS/Linux:**
+```bash
+source venv/bin/activate
+```
+
+After activation, your terminal prompt should show `(venv)` at the beginning.
+
+### Install dependencies
+
+```powershell
+pip install -r requirements.txt
+```
+
+If installation takes a long time or fails, you may be installing dependencies for PostgreSQL support which requires compilation. For development, SQLite is sufficient (already configured).
+
+### Configure environment variables
+
+Copy the example environment file:
+
+```powershell
+Copy-Item .env.example .env
+```
+
+Edit `.env` with your preferred editor. Key values:
+
+```
+SECRET_KEY=your-secret-key-change-in-production
+DEBUG=True
+ALLOWED_HOSTS=localhost,127.0.0.1,127.0.0.1:4200
+```
+
+### Run migrations
+
+Set up the database schema:
+
+```powershell
+python manage.py migrate
+```
+
+You should see output like:
+```
+Running migrations:
+  Applying contenttypes.0001_initial... OK
+  Applying auth.0001_initial... OK
+  ...
+```
+
+### Create superuser (optional)
+
+To access the Django admin panel at `/admin/`:
+
+```powershell
+python manage.py createsuperuser
+```
+
+Follow the prompts to create a username and password.
+
+### Run development server
+
+Start the Django API server (default port 8000):
+
+```powershell
+python manage.py runserver
+```
+
+You should see:
+```
+Starting development server at http://127.0.0.1:8000/
+```
+
+Open your browser to test the API:
+
+```
+http://localhost:8000/api/
+```
+
+You should see a browsable REST API interface.
+
+### Common development commands
+
+```powershell
+# Create database migrations after changing models
+python manage.py makemigrations
+
+# Apply migrations
+python manage.py migrate
+
+# Open Django shell (Python REPL with Django context)
+python manage.py shell
+
+# Run tests
+python manage.py test
+
+# Collect static files (production only)
+python manage.py collectstatic
+```
+
+### Available API endpoints
+
+Once the backend is running, test these endpoints:
+
+- **API Root**: http://localhost:8000/api/
+- **Weather Records**: http://localhost:8000/api/weather/records/
+- **Forecasts**: http://localhost:8000/api/forecasts/forecasts/
+- **Alerts**: http://localhost:8000/api/alerts/alerts/
+- **Favorites**: http://localhost:8000/api/favorites/favorites/
+- **User Profiles**: http://localhost:8000/api/accounts/profiles/
+- **Admin Panel**: http://localhost:8000/admin/
+
+### Troubleshooting
+
+**"ModuleNotFoundError: No module named 'django'"**
+- Ensure the virtual environment is activated (prompt shows `(venv)`)
+- Run `pip install -r requirements.txt`
+
+**"Port 8000 already in use"**
+```powershell
+python manage.py runserver 8001
+```
+
+**Database errors or migration issues**
+```powershell
+# Reset the database (removes all data)
+Remove-Item db.sqlite3
+python manage.py migrate
+```
+
+**Permission denied on activate.ps1**
+```powershell
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+.\venv\Scripts\Activate.ps1
+```
+
+### Connecting frontend to backend
+
+Once both frontend and backend are running:
+
+1. **Frontend** runs on: http://localhost:4200
+2. **Backend** runs on: http://localhost:8000
+
+Edit [frontend/src/environments/environment.ts](frontend/src/environments/environment.ts) to point to the backend API:
+
+```typescript
+export const environment = {
+  production: false,
+  apiBaseUrl: 'http://localhost:8000/api'
+};
+```
+
+The frontend will now be able to fetch data from the backend API.
+
+### Next steps
+
+- Verify the API responds at `http://localhost:8000/api/`
+- Create a superuser and log in to the admin panel at `http://localhost:8000/admin/`
+- Start implementing and testing API endpoints
+- Connect the frontend to the backend API
+
+For detailed backend setup documentation, see [backend/BACKEND_SETUP.md](backend/BACKEND_SETUP.md).
 - Create a local `.env` or CI secrets for any API keys (do not commit secrets).
 
 If you want, I can add a single-command PowerShell script to automate the frontend setup (install + serve) or create a small CONTRIBUTING section describing how to run both backend and frontend together.

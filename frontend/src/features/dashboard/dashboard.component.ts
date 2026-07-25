@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { WelcomeSectionComponent } from './welcome-section/welcome-section.component';
 import { CurrentWeatherCardComponent } from './current-weather-card/current-weather-card.component';
@@ -9,6 +9,7 @@ import { FavoriteCitiesComponent } from './favorite-cities/favorite-cities.compo
 import { RecentAlertsComponent } from './recent-alerts/recent-alerts.component';
 import { WeatherStatisticsComponent } from './weather-statistics/weather-statistics.component';
 import { QuickActionsComponent } from './quick-actions/quick-actions.component';
+import { DashboardData, DashboardService } from '../../core/services/dashboard.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -33,15 +34,15 @@ import { QuickActionsComponent } from './quick-actions/quick-actions.component';
 
       <div class="dashboard-grid">
         <div class="col col-main">
-          <app-current-weather-card></app-current-weather-card>
-          <app-todays-forecast></app-todays-forecast>
-          <app-weekly-forecast></app-weekly-forecast>
-          <app-weather-trend-chart></app-weather-trend-chart>
+          <app-current-weather-card [weather]="dashboard?.current_weather ?? null"></app-current-weather-card>
+          <app-todays-forecast [highlights]="dashboard?.todays_highlights ?? []"></app-todays-forecast>
+          <app-weekly-forecast [trends]="dashboard?.weekly_trends ?? []"></app-weekly-forecast>
+          <app-weather-trend-chart [trends]="dashboard?.weekly_trends ?? []"></app-weather-trend-chart>
         </div>
         <aside class="col col-side">
-          <app-favorite-cities></app-favorite-cities>
-          <app-recent-alerts></app-recent-alerts>
-          <app-weather-statistics></app-weather-statistics>
+          <app-favorite-cities [cities]="dashboard?.favorite_cities ?? []"></app-favorite-cities>
+          <app-recent-alerts [alerts]="dashboard?.recent_alerts ?? []"></app-recent-alerts>
+          <app-weather-statistics [statistics]="dashboard?.weather_statistics ?? null"></app-weather-statistics>
           <app-quick-actions></app-quick-actions>
         </aside>
       </div>
@@ -53,4 +54,23 @@ import { QuickActionsComponent } from './quick-actions/quick-actions.component';
     `@media (max-width: 900px) { .dashboard-grid { grid-template-columns: 1fr; } }`
   ]
 })
-export class DashboardComponent {}
+export class DashboardComponent implements OnInit {
+  dashboard: DashboardData | null = null;
+  loading = true;
+  error: string | null = null;
+
+  constructor(private dashboardService: DashboardService) {}
+
+  ngOnInit(): void {
+    this.dashboardService.getSummary().subscribe({
+      next: data => {
+        this.dashboard = data;
+        this.loading = false;
+      },
+      error: error => {
+        this.error = error.error?.detail || error.error?.error || 'Unable to load dashboard data';
+        this.loading = false;
+      },
+    });
+  }
+}
