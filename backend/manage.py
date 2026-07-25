@@ -3,7 +3,11 @@ import os
 import sys
 
 if __name__ == "__main__":
-    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings.development")
+    os.environ.setdefault(
+        "DJANGO_SETTINGS_MODULE",
+        "config.settings.production"
+    )
+
     try:
         from django.core.management import execute_from_command_line
     except ImportError as exc:
@@ -11,4 +15,5 @@ if __name__ == "__main__":
             "Couldn't import Django. Are you sure it's installed and "
             "available on your environment?"
         ) from exc
+
     execute_from_command_line(sys.argv)
