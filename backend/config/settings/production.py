@@ -6,10 +6,14 @@ from .base import *
 
 DEBUG = False
 
-ALLOWED_HOSTS = os.getenv(
-    "ALLOWED_HOSTS",
-    ".up.railway.app"
-).split(",")
+ALLOWED_HOSTS = [
+    host.strip()
+    for host in os.getenv(
+        "ALLOWED_HOSTS",
+        ".up.railway.app"
+    ).split(",")
+    if host.strip()
+]
 
 # ------------------------------------------------------------------------------
 # Database
@@ -23,10 +27,11 @@ ALLOWED_HOSTS = os.getenv(
 
 CORS_ALLOW_ALL_ORIGINS = False
 
-CORS_ALLOWED_ORIGINS = os.getenv(
-    "CORS_ALLOWED_ORIGINS",
-    ""
-).split(",")
+CORS_ALLOWED_ORIGINS = [
+    origin.strip()
+    for origin in os.getenv("CORS_ALLOWED_ORIGINS", "").split(",")
+    if origin.strip()
+]
 
 CORS_ALLOW_CREDENTIALS = True
 
@@ -34,10 +39,11 @@ CORS_ALLOW_CREDENTIALS = True
 # CSRF
 # ------------------------------------------------------------------------------
 
-CSRF_TRUSTED_ORIGINS = os.getenv(
-    "CSRF_TRUSTED_ORIGINS",
-    ""
-).split(",")
+CSRF_TRUSTED_ORIGINS = [
+    origin.strip()
+    for origin in os.getenv("CSRF_TRUSTED_ORIGINS", "").split(",")
+    if origin.strip()
+]
 
 # ------------------------------------------------------------------------------
 # Security
